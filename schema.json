@@ -1,0 +1,125 @@
+{
+  "$comment": "",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "additionalProperties": false,
+  "required": ["components"],
+  "type": "object",
+  "properties": {
+    "components": {
+      "$ref": "#/definitions/components"
+    }
+  },
+  "definitions": {
+    "components": {
+      "type": "object",
+      "patternProperties": {
+        "^[_a-zA-Z][a-zA-Z0-9_-]*$": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/component"
+            }
+          ]
+        }
+      },
+      "minProperties": 1
+    },
+    "component": {
+      "$comment": "",
+      "description": "",
+      "type": "object",
+      "required": ["type", "elements"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["app", "queue", "database", "cloud", "other"]
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/componentValue"
+              }
+            ]
+          }
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/elementGroup"
+          }
+        }
+      }
+    },
+    "elementGroup": {
+      "type": "object",
+      "required": ["name", "elements"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "elements": {
+          "$ref": "#/definitions/elements"
+        }
+      }
+    },
+    "elements": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "$ref": "#/definitions/componentValue"
+          }
+        ]
+      }
+    },
+    "componentValue": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "input": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/relation"
+          }
+        },
+        "output": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/relation"
+          }
+        },
+        "use": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/relation"
+          }
+        }
+      }
+    },
+    "relation": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "component": {
+          "type": "string"
+        },
+        "relation": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
