@@ -1,19 +1,6 @@
 import {ParsedYaml, ComponentYaml, ComponentElemYaml, RelationYaml, GroupYaml, elemName} from './ParsedYaml'
 
-const queueColor = "#bff"
 
-function plantumlType(type: string): string {
-  if (type === "queue") {
-    return "queue"
-  }
-  if (type === "database") {
-    return "database"
-  }
-  if (type === "cloud") {
-    return "cloud"
-  }
-  return "node"
-}
 
 function groupedBlock(type: string, compName: string, elems: Array<string|ComponentElemYaml>): string {
   const elements = new Array<string>()
@@ -26,44 +13,59 @@ function groupedBlock(type: string, compName: string, elems: Array<string|Compon
     if (elem !== null && typeof elem === 'object') {
       if (elem.input) {
         elem.input.forEach((mapping: RelationYaml) => {
-          const relation = mapping.relation ? ":" + mapping.relation : ""
-          relations.push(`[${mapping.name}] --> [${name}]${relation}`)
+          relations.push(`${mapping.name} --> ${name}`)
         })
       }
       if (elem.output) {
         elem.output.forEach((mapping: RelationYaml) => {
-          const relation = mapping.relation ? ":" + mapping.relation : ""
-          relations.push(`[${name}] --> [${mapping.name}]${relation}`)
+          relations.push(`${name} --> ${mapping.name}`)
         })
       }
     }
   })
 
-  if (type === "queue") {
-    return elements.map((elem, idx) => {
-      return `
-${type} "${compName}/${elem}"${queueColor} {
-[${elem}]
-}
-`
-    }).join("\n")
+  const indent = "  "
+  function shape(elem: string) {
+    if (type === 'queue') {
+      return `${elem}>${elem}]:::queueClass`
+    }
+    return elem
   }
 
-  const elementsBlock = elements.map((elem) => `[${elem}]`).join("\n")
-  const relationsBlock = relations.join("\n")
+  function subgraphs() {
+    if (type === 'app') {
+      const elementsBlock = elements.map((elem) => `${indent}${shape(elem)}`).join("\n")
+      return wrapSubgraph(elementsBlock)
+    } else {
+      return elements.map((elem) => `${indent}subgraph ${compName}/${elem}
+${indent}${shape(elem)}
+${indent}end
+`)
+        .join("\n")
+    }
+  }
+
+  function wrapSubgraph(block: string) {
+    return `${indent}subgraph ${compName}
+${block}
+${indent}end
+`
+  }
+
+  // const elementsBlock = elements.map((elem) => `${indent}${shape(elem)}`).join("\n")
+  const relationsBlock = relations.map((rel) => indent + rel).join("\n")
+
   return `
-${type} "${compName}" {
-${elementsBlock}
+${subgraphs()}
 ${relationsBlock}
-}
 `
 }
 
-export function buildPuml(parsedYaml: ParsedYaml): string {
+export function buildMermaid(parsedYaml: ParsedYaml): string {
 
   const components = new Array<string>()
   parsedYaml.components.forEach((component: ComponentYaml, name: string) => {
-    const type = plantumlType(component.type)
+    const type = component.type
 
     const block = groupedBlock(type, name, component.elements)
     components.push(block);
@@ -77,12 +79,11 @@ export function buildPuml(parsedYaml: ParsedYaml): string {
   })
   const componentsBlock = components.join("\n")
 
+  const mermaidText = `
+flowchart TD
+  classDef queueClass fill:#bff,color:#333
 
-  return `
-@startuml
 ${componentsBlock}
-@enduml
 `
-
-
+  return "```mermaid\n" + mermaidText + "\n```\n"
 }

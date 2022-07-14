@@ -25,3 +25,11 @@ export interface RelationYaml {
   component?: string,
   relation?: string
 }
+
+export function elemName(elem: string|ComponentElemYaml): string {
+  if (typeof elem === 'string') {
+    return elem
+  } else {
+    return elem.name
+  }
+}
