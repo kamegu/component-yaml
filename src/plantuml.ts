@@ -27,13 +27,13 @@ function groupedBlock(type: string, compName: string, elems: Array<string|Compon
       if (elem.input) {
         elem.input.forEach((mapping: RelationYaml) => {
           const relation = mapping.relation ? ":" + mapping.relation : ""
-          relations.push(`[${mapping.name}] --> [${name}]${relation}`)
+          relations.push(`[${mapping.ref}] --> [${name}]${relation}`)
         })
       }
       if (elem.output) {
         elem.output.forEach((mapping: RelationYaml) => {
           const relation = mapping.relation ? ":" + mapping.relation : ""
-          relations.push(`[${name}] --> [${mapping.name}]${relation}`)
+          relations.push(`[${name}] --> [${mapping.ref}]${relation}`)
         })
       }
     }

@@ -108,9 +108,9 @@
     },
     "relation": {
       "type": "object",
-      "required": ["name"],
+      "required": ["ref"],
       "properties": {
-        "name": {
+        "ref": {
           "type": "string"
         },
         "component": {

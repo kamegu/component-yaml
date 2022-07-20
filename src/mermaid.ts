@@ -13,17 +13,17 @@ function groupedBlock(type: string, compName: string, elems: Array<string|Compon
     if (elem !== null && typeof elem === 'object') {
       if (elem.input) {
         elem.input.forEach((mapping: RelationYaml) => {
-          relations.push(`${mapping.name} --> ${name}`)
+          relations.push(`${mapping.ref} --> ${name}`)
         })
       }
       if (elem.output) {
         elem.output.forEach((mapping: RelationYaml) => {
-          relations.push(`${name} --> ${mapping.name}`)
+          relations.push(`${name} --> ${mapping.ref}`)
         })
       }
       if (elem.use) {
         elem.use.forEach((mapping: RelationYaml) => {
-          relations.push(`${name} -.-> ${mapping.name}`)
+          relations.push(`${name} -.-> ${mapping.ref}`)
         })
       }
     }

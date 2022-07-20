@@ -21,17 +21,17 @@ export class ReferenceSet {
       if (elem !== null && typeof elem === 'object') {
         if (elem.input) {
           elem.input.forEach((relation) => {
-            this.updateRefMap(name, relation.name, "input", "inputted")
+            this.updateRefMap(name, relation.ref, "input", "inputted")
           })
         }
         if (elem.output) {
           elem.output.forEach((relation) => {
-            this.updateRefMap(name, relation.name, "output", "outputted")
+            this.updateRefMap(name, relation.ref, "output", "outputted")
           })
         }
         if (elem.use) {
           elem.use.forEach((relation) => {
-            this.updateRefMap(name, relation.name, "use", "used")
+            this.updateRefMap(name, relation.ref, "use", "used")
           })
         }
       }

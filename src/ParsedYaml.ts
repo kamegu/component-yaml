@@ -21,7 +21,7 @@ export interface ComponentElemYaml {
 }
 
 export interface RelationYaml {
-  name: string,
+  ref: string,
   component?: string,
   relation?: string
 }
