@@ -51,12 +51,28 @@ function filterGroups(groups: Array<GroupYaml>|undefined, targets: Array<string>
 function filterElement(elements: Array<string|ComponentElemYaml>, targets: Array<string>) {
   const filtered = new Array<string|ComponentElemYaml>()
 
-  elements.forEach((elem) => {
-    const refkey = (new Element(elem)).refkey
+  elements.forEach((e) => {
+    const elem = new Element(e)
+    const refkey = elem.refkey
     if (targets.includes(refkey)) {
-      filtered.push(elem)
+      const el = elem.inner
+      el.input = filterRelation(el.input, targets)
+      el.output = filterRelation(el.output, targets)
+      el.use = filterRelation(el.use, targets)
+      filtered.push(el)
     }
   })
 
+  return filtered
+}
+
+function filterRelation(relations: Array<RelationYaml>|undefined, targets: Array<string>) {
+  if (!relations) {
+    return relations
+  }
+  const filtered = relations.filter((relation) => targets.includes(relation.ref))
+  if (filtered.length === 0) {
+    return undefined
+  }
   return filtered
 }

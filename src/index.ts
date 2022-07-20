@@ -34,6 +34,8 @@ function run(): void {
     .option('--output <str>', 'output file', 'components')
     .option('--target <str>', 'target elements(comma-separated)', commaSeparatedList, [])
     .option('--distance <num>', 'distance from target', '3')
+    .option('--ignore <str>', 'ignored component(comma-separated)', commaSeparatedList, [])
+    .option('--ignore-unknown', 'ignored unknown ref')
 
   program.parse()
   const options = program.opts();
@@ -45,6 +47,8 @@ function run(): void {
 
   const targets = options.target
   const distance = parseInt(options.distance, 10)
+  const ignores = options.ignore
+  const ignoreUnknown = options.ignoreUnknown
 
   const file = fs.readFileSync('./components.yaml', 'utf8')
   const raw = YAML.parse(file)
@@ -53,10 +57,10 @@ function run(): void {
 
   const parsed = parseRawYaml(raw)
 
-  console.log({'targets': targets, 'distance': distance})
+  console.log({'targets': targets, 'distance': distance, 'ignore': ignores, 'ignoreUnknown': ignoreUnknown})
   const referenceSet = new ReferenceSet(parsed)
-  const referable = referenceSet.referable(targets, distance)
-  console.log(['referable', referable])
+  const referable = referenceSet.referable(targets, distance, ignores, ignoreUnknown)
+  console.log({'referable': referable})
 
   const filtered = filterYaml(parsed, referable)
 

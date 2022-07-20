@@ -2,22 +2,29 @@ import {ComponentElemYaml, Element, GroupYaml, ParsedYaml} from "./ParsedYaml";
 
 export class ReferenceSet {
   refMap: Map<string, Map<string, string>>
+  appMap: Map<string, string> // refkey => component
 
   constructor(parsed: ParsedYaml) {
     this.refMap = new Map
+    this.appMap = new Map
     parsed.components.forEach((comp, name) => {
-      this.initElementRefs(comp.elements)
+      this.initElementRefs(name, comp.elements)
       if (comp.groups) {
         comp.groups.forEach((group: GroupYaml) => {
-          this.initElementRefs(group.elements)
+          this.initElementRefs(name, group.elements)
         })
       }
     })
   }
 
-  private initElementRefs(elements: Array<string|ComponentElemYaml>) {
+  private initElementRefs(name: string, elements: Array<string|ComponentElemYaml>) {
     elements.forEach((e) => {
       const elem = new Element(e)
+      if (this.appMap.has(elem.refkey)) {
+        console.error("duplicated key exists: " + elem.refkey)
+        process.exit()
+      }
+      this.appMap.set(elem.refkey, name)
       if (e !== null && typeof e === 'object') {
         if (e.input) {
           e.input.forEach((relation) => {
@@ -46,7 +53,7 @@ export class ReferenceSet {
     this.refMap.set(refId, backwardMap)
   }
 
-  referable(targets: Array<string>, distance: number = 2) {
+  referable(targets: Array<string>, distance: number = 2, ignores: Array<string>, ignoreUnknown: boolean) {
     const refIds = new Set<string>()
     targets.forEach((target) => {
       refIds.add(target)
@@ -65,7 +72,13 @@ export class ReferenceSet {
         })
       }
     })
-    return Array.from(refIds)
+    return Array.from(refIds).filter((refkey) => {
+      if (this.appMap.has(refkey)) {
+        return !ignores.includes(this.appMap.get(refkey))
+      } else {
+        return !ignoreUnknown
+      }
+    })
   }
 
   private referableSingle(target: string, srcElem: string, distance: number, filterType: Array<string>): Set<string> {

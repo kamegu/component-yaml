@@ -1,6 +1,9 @@
 import {ParsedYaml, ComponentYaml, ComponentElemYaml, RelationYaml, GroupYaml, Element} from './ParsedYaml'
 
 function groupedBlock(type: string, compName: string, elems: Array<string|ComponentElemYaml>): string {
+  if (elems.length === 0) {
+    return ""
+  }
   const elements = new Array<Element>()
   const relations = new Array<string>()
 
@@ -38,10 +41,7 @@ function groupedBlock(type: string, compName: string, elems: Array<string|Compon
     if (type === 'database') {
       return `${refkey}[(${elemName})]:::databaseClass`
     }
-    if (refkey !== elemName) {
-      return `${refkey}[${elemName}]`
-    }
-    return elemName
+    return `${refkey}[${elemName}]`
   }
 
   function subgraphs() {
@@ -66,10 +66,15 @@ ${indent}end
 
   // const elementsBlock = elements.map((elem) => `${indent}${shape(elem)}`).join("\n")
   const relationsBlock = relations.map((rel) => indent + rel).join("\n")
+  const urlsBlock = elements.filter((elem: Element) => {
+    return elem.inner.url && elem.inner.url.length > 0
+  }).map((elem) => `${indent}click ${elem.refkey} "${elem.inner.url[0]}" _blank`)
+    .join("\n")
 
   return `
 ${subgraphs()}
 ${relationsBlock}
+${urlsBlock}
 `
 }
 

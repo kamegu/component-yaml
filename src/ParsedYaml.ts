@@ -18,6 +18,7 @@ export interface GroupYaml {
 export interface ComponentElemYaml {
   name: string,
   id?: string
+  url?: Array<string>
   description?: string
   input?: Array<RelationYaml>,
   output?: Array<RelationYaml>,

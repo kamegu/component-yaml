@@ -98,6 +98,12 @@
         "id": {
           "type": "string"
         },
+        "url": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "description": {
           "type": "string"
         },
