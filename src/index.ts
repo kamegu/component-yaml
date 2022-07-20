@@ -33,8 +33,8 @@ function run(): void {
     .option('--output-dir <str>', 'output directory', 'output')
     .option('--output <str>', 'output file', 'components')
     .option('--target <str>', 'target elements(comma-separated)', commaSeparatedList, [])
-    .option('--distance <num>', 'distance from target', '3')
-    .option('--ignore <str>', 'ignored component(comma-separated)', commaSeparatedList, [])
+    .option('--ignore <str>', 'ignored target(comma-separated)', commaSeparatedList, [])
+    .option('--distance <num>', 'distance from target', '2')
     .option('--ignore-unknown', 'ignored unknown ref')
 
   program.parse()

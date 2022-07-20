@@ -8,8 +8,8 @@ export function filterYaml(parsed: ParsedYaml, targets: Array<string>): ParsedYa
   const components = new Map<string, ComponentYaml>();
 
   parsed.components.forEach((comp, name) => {
-    const filteredElements = filterElement(comp.elements, targets)
-    const filteredGroups = filterGroups(comp.groups, targets)
+    const filteredElements = filterElement(name, comp.elements, targets)
+    const filteredGroups = filterGroups(name, comp.groups, targets)
     if (filteredElements.length > 0 || (filteredGroups && filteredGroups.length > 0)) {
       const filteredComponent = {
         type: comp.type,
@@ -26,14 +26,14 @@ export function filterYaml(parsed: ParsedYaml, targets: Array<string>): ParsedYa
 
 }
 
-function filterGroups(groups: Array<GroupYaml>|undefined, targets: Array<string>): Array<GroupYaml>|undefined {
+function filterGroups(name: string, groups: Array<GroupYaml>|undefined, targets: Array<string>): Array<GroupYaml>|undefined {
   if (!groups) {
     return groups
   }
   const filtered = new Array<GroupYaml>()
 
   groups.forEach((group) => {
-    const elems = filterElement(group.elements, targets)
+    const elems = filterElement(name, group.elements, targets)
     if (elems.length > 0) {
       filtered.push({
         name: group.name,
@@ -48,11 +48,11 @@ function filterGroups(groups: Array<GroupYaml>|undefined, targets: Array<string>
   return filtered
 }
 
-function filterElement(elements: Array<string|ComponentElemYaml>, targets: Array<string>) {
+function filterElement(name: string, elements: Array<string|ComponentElemYaml>, targets: Array<string>) {
   const filtered = new Array<string|ComponentElemYaml>()
 
   elements.forEach((e) => {
-    const elem = new Element(e)
+    const elem = new Element(name, e)
     const refkey = elem.refkey
     if (targets.includes(refkey)) {
       const el = elem.inner

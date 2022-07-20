@@ -35,15 +35,15 @@ export class Element {
   inner: ComponentElemYaml
   refkey: string
 
-  constructor(src: string|ComponentElemYaml) {
+  constructor(name: string, src: string|ComponentElemYaml) {
     if (typeof src === 'string') {
       this.inner = {
         name: src
       }
-      this.refkey = src
+      this.refkey = name + '//' + src
     } else {
       this.inner = src
-      this.refkey = src.id || src.name
+      this.refkey = src.id || name + '//' + src.name
     }
   }
 }

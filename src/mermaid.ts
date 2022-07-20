@@ -8,7 +8,7 @@ function groupedBlock(type: string, compName: string, elems: Array<string|Compon
   const relations = new Array<string>()
 
   elems.forEach((e: string| ComponentElemYaml) => {
-    const elem = new Element(e)
+    const elem = new Element(compName, e)
     const name = elem.refkey
     elements.push(elem)
 

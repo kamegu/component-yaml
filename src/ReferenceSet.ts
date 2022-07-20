@@ -19,7 +19,7 @@ export class ReferenceSet {
 
   private initElementRefs(name: string, elements: Array<string|ComponentElemYaml>) {
     elements.forEach((e) => {
-      const elem = new Element(e)
+      const elem = new Element(name, e)
       if (this.appMap.has(elem.refkey)) {
         console.error("duplicated key exists: " + elem.refkey)
         process.exit()
@@ -54,8 +54,11 @@ export class ReferenceSet {
   }
 
   referable(targets: Array<string>, distance: number = 2, ignores: Array<string>, ignoreUnknown: boolean) {
+    const converted = this.normalizeTargets(targets)
+    const normalizedIgnores = this.normalizeTargets(ignores)
+
     const refIds = new Set<string>()
-    targets.forEach((target) => {
+    converted.forEach((target) => {
       refIds.add(target)
       const refs = this.refMap.get(target)
       if (refs) {
@@ -74,7 +77,7 @@ export class ReferenceSet {
     })
     return Array.from(refIds).filter((refkey) => {
       if (this.appMap.has(refkey)) {
-        return !ignores.includes(this.appMap.get(refkey))
+        return !normalizedIgnores.includes(refkey)
       } else {
         return !ignoreUnknown
       }
@@ -101,5 +104,30 @@ export class ReferenceSet {
     }
 
     return refIds
+  }
+
+  private normalizeTargets(targets: Array<string>): Array<string> {
+    const converted = new Array<string>()
+    targets.forEach((target) => {
+      if (target.includes("//")) {
+        if (target.endsWith("//")) {
+          this.appMap.forEach((_, refkey) => {
+            if (refkey.startsWith(target)) {
+              converted.push(refkey)
+            }
+          })
+        } else {
+          converted.push(target)
+        }
+      } else {
+        const filtered = Array.from(this.appMap.keys()).filter((refkey) => refkey.endsWith('//' + target))
+        if (filtered.length !== 1) {
+          console.error(`unknown element: size=${filtered.length}:` + target)
+          process.exit()
+        }
+        converted.push(filtered[0])
+      }
+    })
+    return converted
   }
 }
