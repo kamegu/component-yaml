@@ -21,6 +21,11 @@ function groupedBlock(type: string, compName: string, elems: Array<string|Compon
           relations.push(`${name} --> ${mapping.name}`)
         })
       }
+      if (elem.use) {
+        elem.use.forEach((mapping: RelationYaml) => {
+          relations.push(`${name} -.-> ${mapping.name}`)
+        })
+      }
     }
   })
 
@@ -28,6 +33,9 @@ function groupedBlock(type: string, compName: string, elems: Array<string|Compon
   function shape(elem: string) {
     if (type === 'queue') {
       return `${elem}>${elem}]:::queueClass`
+    }
+    if (type === 'database') {
+      return `${elem}[(${elem})]:::databaseClass`
     }
     return elem
   }
@@ -82,6 +90,7 @@ export function buildMermaid(parsedYaml: ParsedYaml): string {
   const mermaidText = `
 flowchart TD
   classDef queueClass fill:#bff,color:#333
+  classDef databaseClass fill:#bff,color:#333
 
 ${componentsBlock}
 `
