@@ -1,4 +1,4 @@
-import {ParsedYaml, ComponentYaml, ComponentElemYaml, RelationYaml, GroupYaml, elemName} from './ParsedYaml'
+import {ParsedYaml, ComponentYaml, ComponentElemYaml, RelationYaml, GroupYaml, Element} from './ParsedYaml'
 
 export function filterYaml(parsed: ParsedYaml, targets: Array<string>): ParsedYaml {
   if (!targets || targets.length === 0) {
@@ -52,8 +52,8 @@ function filterElement(elements: Array<string|ComponentElemYaml>, targets: Array
   const filtered = new Array<string|ComponentElemYaml>()
 
   elements.forEach((elem) => {
-    const name = elemName(elem)
-    if (targets.includes(name)) {
+    const refkey = (new Element(elem)).refkey
+    if (targets.includes(refkey)) {
       filtered.push(elem)
     }
   })

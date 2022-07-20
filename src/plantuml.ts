@@ -1,4 +1,4 @@
-import {ParsedYaml, ComponentYaml, ComponentElemYaml, RelationYaml, GroupYaml, elemName} from './ParsedYaml'
+import {ParsedYaml, ComponentYaml, ComponentElemYaml, RelationYaml, GroupYaml, Element} from './ParsedYaml'
 
 const queueColor = "#bff"
 
@@ -16,24 +16,24 @@ function plantumlType(type: string): string {
 }
 
 function groupedBlock(type: string, compName: string, elems: Array<string|ComponentElemYaml>): string {
-  const elements = new Array<string>()
+  const elements = new Array<Element>()
   const relations = new Array<string>()
 
-  elems.forEach((elem: string| ComponentElemYaml) => {
-    const name = elemName(elem)
-    elements.push(name)
+  elems.forEach((e: string| ComponentElemYaml) => {
+    const elem = new Element(e)
+    elements.push(elem)
 
-    if (elem !== null && typeof elem === 'object') {
-      if (elem.input) {
-        elem.input.forEach((mapping: RelationYaml) => {
+    if (e !== null && typeof e === 'object') {
+      if (e.input) {
+        e.input.forEach((mapping: RelationYaml) => {
           const relation = mapping.relation ? ":" + mapping.relation : ""
-          relations.push(`[${mapping.ref}] --> [${name}]${relation}`)
+          relations.push(`[${mapping.ref}] --> [${elem.refkey}]${relation}`)
         })
       }
-      if (elem.output) {
-        elem.output.forEach((mapping: RelationYaml) => {
+      if (e.output) {
+        e.output.forEach((mapping: RelationYaml) => {
           const relation = mapping.relation ? ":" + mapping.relation : ""
-          relations.push(`[${name}] --> [${mapping.ref}]${relation}`)
+          relations.push(`[${elem.refkey}] --> [${mapping.ref}]${relation}`)
         })
       }
     }
@@ -42,14 +42,14 @@ function groupedBlock(type: string, compName: string, elems: Array<string|Compon
   if (type === "queue") {
     return elements.map((elem, idx) => {
       return `
-${type} "${compName}/${elem}"${queueColor} {
-[${elem}]
+${type} "${compName}/${elem.inner.name}"${queueColor} {
+[${elem.refkey}]
 }
 `
     }).join("\n")
   }
 
-  const elementsBlock = elements.map((elem) => `[${elem}]`).join("\n")
+  const elementsBlock = elements.map((elem) => `[${elem.refkey}]`).join("\n")
   const relationsBlock = relations.join("\n")
   return `
 ${type} "${compName}" {

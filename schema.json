@@ -33,6 +33,15 @@
           "type": "string",
           "enum": ["app", "queue", "database", "cloud", "other"]
         },
+        "url": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
         "elements": {
           "type": "array",
           "items": {
@@ -84,6 +93,12 @@
       "required": ["name"],
       "properties": {
         "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "description": {
           "type": "string"
         },
         "input": {

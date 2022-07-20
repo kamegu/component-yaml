@@ -1,4 +1,4 @@
-import {ComponentElemYaml, elemName, GroupYaml, ParsedYaml} from "./ParsedYaml";
+import {ComponentElemYaml, Element, GroupYaml, ParsedYaml} from "./ParsedYaml";
 
 export class ReferenceSet {
   refMap: Map<string, Map<string, string>>
@@ -16,22 +16,22 @@ export class ReferenceSet {
   }
 
   private initElementRefs(elements: Array<string|ComponentElemYaml>) {
-    elements.forEach((elem) => {
-      const name = elemName(elem)
-      if (elem !== null && typeof elem === 'object') {
-        if (elem.input) {
-          elem.input.forEach((relation) => {
-            this.updateRefMap(name, relation.ref, "input", "inputted")
+    elements.forEach((e) => {
+      const elem = new Element(e)
+      if (e !== null && typeof e === 'object') {
+        if (e.input) {
+          e.input.forEach((relation) => {
+            this.updateRefMap(elem.refkey, relation.ref, "input", "inputted")
           })
         }
-        if (elem.output) {
-          elem.output.forEach((relation) => {
-            this.updateRefMap(name, relation.ref, "output", "outputted")
+        if (e.output) {
+          e.output.forEach((relation) => {
+            this.updateRefMap(elem.refkey, relation.ref, "output", "outputted")
           })
         }
-        if (elem.use) {
-          elem.use.forEach((relation) => {
-            this.updateRefMap(name, relation.ref, "use", "used")
+        if (e.use) {
+          e.use.forEach((relation) => {
+            this.updateRefMap(elem.refkey, relation.ref, "use", "used")
           })
         }
       }
