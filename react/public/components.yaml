@@ -1,0 +1,21 @@
+components:
+  db1:
+    type: database
+    elements:
+      - table1
+      - table2
+    groups:
+      - name: heavy
+        elements:
+          - heavy_table_1
+          - heavy_table_2
+  webapp:
+    type: app
+    elements:
+      - name: api1
+        use:
+          - ref: table1
+      - name: api2
+        use:
+          - ref: table1
+          - ref: table2
