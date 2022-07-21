@@ -78,7 +78,7 @@ ${urlsBlock}
 `
 }
 
-export function buildMermaid(parsedYaml: ParsedYaml): string {
+export function buildMermaid(parsedYaml: ParsedYaml, wrapMarkdown: boolean = true): string {
 
   const components = new Array<string>()
   parsedYaml.components.forEach((component: ComponentYaml, name: string) => {
@@ -103,5 +103,9 @@ flowchart TD
 
 ${componentsBlock}
 `
-  return "```mermaid\n" + mermaidText + "\n```\n"
+  if (wrapMarkdown) {
+    return "```mermaid\n" + mermaidText + "\n```\n"
+  } else {
+    return mermaidText
+  }
 }

@@ -1,3 +1,17 @@
+
+export function parseRawYaml(rawYaml: any): ParsedYaml {
+  const components = new Map<string, ComponentYaml>();
+
+  if (rawYaml.components instanceof Object) {
+    for (const key of Object.keys(rawYaml.components)) {
+      components.set(key, rawYaml.components[key])
+    }
+  }
+  return {
+    components: components
+  }
+}
+
 export interface ParsedYaml {
   components: Map<string, ComponentYaml>
 }

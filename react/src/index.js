@@ -3,28 +3,18 @@ import ReactDOM from 'react-dom/client';
 import YAML from 'yaml'
 import './index.css'
 import {ReferenceSet} from "cli/dist/ReferenceSet";
-
-function parseRawYaml(rawYaml) {
-  const components = new Map();
-
-  if (rawYaml.components instanceof Object) {
-    for (const key of Object.keys(rawYaml.components)) {
-      components.set(key, rawYaml.components[key])
-    }
-  }
-  return {
-    components: components
-  }
-}
+import {parseRawYaml} from "cli/dist/ParsedYaml";
+import {filterYaml} from "cli/dist/filterYaml";
+import {buildMermaid} from "cli/dist/mermaid";
+import Mermaid from "./Mermaid";
 
 class ComponentList extends React.Component {
   render() {
     const components = [];
-    if (this.props.components instanceof Object) {
-      for (const key of Object.keys(this.props.components)) {
-        components.push({name: key, component: this.props.components[key]})
-      }
-    }
+    this.props.components.forEach((comp, key) => {
+      components.push({name: key, component: comp})
+    })
+
     return (
       <table className="pure-table pure-table-bordered">
         <thead>
@@ -59,7 +49,7 @@ class SelectedComponent extends React.Component {
       <div>
       <div>{componentName}</div>
       <table className="pure-table pure-table-bordered">
-        <thead><th>Group</th><th>Name</th><th></th></thead>
+        <thead><tr><th>Group</th><th>Name</th><th></th></tr></thead>
         <ElementList key="--unknown-group" elements={this.props.component.elements} componentName={componentName} groupName=""></ElementList>
         {(this.props.component.groups || []).map((g) => {
           return <ElementList key={g.name} elements={g.elements} componentName={componentName} groupName={g.name}></ElementList>
@@ -73,7 +63,7 @@ class SelectedComponent extends React.Component {
 class ElementList extends React.Component {
 
   render() {
-    if (!this.props.elements) {
+    if (!this.props.elements || this.props.elements.length === 0) {
       return null
     }
     const prefix = `${this.props.componentName}--${this.props.groupName||''}--`
@@ -85,9 +75,9 @@ class ElementList extends React.Component {
             return <tr key={prefix+e}>{group}<td>{e}</td><td></td></tr>
           } else {
             const relations = <ul>
-              {(e.input || []).map((r) => <li>{r.ref}</li>)}
-              {(e.output || []).map((r) => <li>{r.ref}</li>)}
-              {(e.use || []).map((r) => <li>{r.ref}</li>)}
+              {(e.input || []).map((r) => <li key={r.ref}>{r.ref}</li>)}
+              {(e.output || []).map((r) => <li key={r.ref}>{r.ref}</li>)}
+              {(e.use || []).map((r) => <li key={r.ref}>{r.ref}</li>)}
             </ul>
             return <tr key={prefix+e.name}>{group}<td>{e.name}</td><td>{relations}</td></tr>
           }
@@ -101,6 +91,7 @@ class ReferableComponents extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      parsedYaml: props.parsedYaml,
       referenceSet: props.referenceSet,
       config: {
         distance: 2,
@@ -116,9 +107,17 @@ class ReferableComponents extends React.Component {
     const referable = this.state.referenceSet.referable(targets, config.distance, config.ignores, config.ignoreUnknown)
     console.log('referable', referable)
 
+    const filtered = filterYaml(this.state.parsedYaml, referable)
+    const mermaidText = buildMermaid(filtered, false)
+
+    console.log('mermaidText', mermaidText)
+
     return (
       <div>
+        <div>
         {referable.map((ref) => <span key={ref}>{ref}</span>)}
+        </div>
+        <Mermaid chart={mermaidText} />
       </div>
     )
   }
@@ -146,7 +145,7 @@ class ComponentsRoot extends React.Component {
           console.log(raw)
           this.setState({
             isLoaded: true,
-            components: raw.components,
+            parsedYaml: parsed,
             referenceSet,
             selected: null
           });
@@ -170,20 +169,20 @@ class ComponentsRoot extends React.Component {
   }
 
   render() {
-    const { isLoaded, components, selected } = this.state;
+    const { isLoaded, parsedYaml, selected } = this.state;
     console.log('render', this.state)
 
     if (!isLoaded) {
       return <div>Loading...</div>;
     } else {
-      const selectedComp = this.state.components[selected] || null
+      const selectedComp = this.state.parsedYaml.components.get(selected) || null
       return (
         <div>
           <div>components</div>
-          <ComponentList components={components} selected={selected} onSelectComponent={(n) => this.onSelectComponent(n)}></ComponentList>
+          <ComponentList components={parsedYaml.components} selected={selected} onSelectComponent={(n) => this.onSelectComponent(n)}></ComponentList>
 
           <SelectedComponent name={selected} component={selectedComp}></SelectedComponent>
-          <ReferableComponents target={selected + "//"} referenceSet={this.state.referenceSet}></ReferableComponents>
+          <ReferableComponents parsedYaml={parsedYaml} target={selected + "//"} referenceSet={this.state.referenceSet}></ReferableComponents>
         </div>
       );
     }

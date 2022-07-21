@@ -3,25 +3,11 @@ import * as YAML from 'yaml'
 import { Command } from 'commander';
 const program = new Command();
 
-import {ParsedYaml, ComponentYaml} from './ParsedYaml.js'
+import {parseRawYaml} from './ParsedYaml.js'
 import {filterYaml} from "./filterYaml.js";
 import {ReferenceSet} from "./ReferenceSet.js";
 import {buildPuml} from './plantuml.js'
 import {buildMermaid} from "./mermaid.js";
-
-function parseRawYaml(rawYaml: any): ParsedYaml {
-  const components = new Map<string, ComponentYaml>();
-
-  if (rawYaml.components instanceof Object) {
-    for (const key of Object.keys(rawYaml.components)) {
-      components.set(key, rawYaml.components[key])
-    }
-  }
-  return {
-    components: components
-  }
-}
-
 
 function run(): void {
   function commaSeparatedList(value, dummyPrevious) {
