@@ -2,6 +2,20 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import YAML from 'yaml'
 import './index.css'
+import {ReferenceSet} from "cli/dist/ReferenceSet";
+
+function parseRawYaml(rawYaml) {
+  const components = new Map();
+
+  if (rawYaml.components instanceof Object) {
+    for (const key of Object.keys(rawYaml.components)) {
+      components.set(key, rawYaml.components[key])
+    }
+  }
+  return {
+    components: components
+  }
+}
 
 class ComponentList extends React.Component {
   render() {
@@ -83,12 +97,40 @@ class ElementList extends React.Component {
   }
 }
 
+class ReferableComponents extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      referenceSet: props.referenceSet,
+      config: {
+        distance: 2,
+        ignores: [],
+        ignoreUnknown: false
+      }
+    }
+  }
+
+  render() {
+    const targets = this.props.target ? [this.props.target] : []
+    const config = this.state.config
+    const referable = this.state.referenceSet.referable(targets, config.distance, config.ignores, config.ignoreUnknown)
+    console.log('referable', referable)
+
+    return (
+      <div>
+        {referable.map((ref) => <span key={ref}>{ref}</span>)}
+      </div>
+    )
+  }
+}
+
 class ComponentsRoot extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       isLoaded: false,
       components: null,
+      referenceSet: null,
       selected: null
     }
   }
@@ -99,10 +141,13 @@ class ComponentsRoot extends React.Component {
       .then(
         (result) => {
           const raw = YAML.parse(result)
+          const parsed = parseRawYaml(raw)
+          const referenceSet = new ReferenceSet(parsed)
           console.log(raw)
           this.setState({
             isLoaded: true,
             components: raw.components,
+            referenceSet,
             selected: null
           });
         },
@@ -132,14 +177,13 @@ class ComponentsRoot extends React.Component {
       return <div>Loading...</div>;
     } else {
       const selectedComp = this.state.components[selected] || null
-      const selectedElements = (selectedComp && selectedComp.elements) || []
-      console.log('aaaaa', selected, selectedComp, selectedElements)
       return (
         <div>
           <div>components</div>
           <ComponentList components={components} selected={selected} onSelectComponent={(n) => this.onSelectComponent(n)}></ComponentList>
 
           <SelectedComponent name={selected} component={selectedComp}></SelectedComponent>
+          <ReferableComponents target={selected + "//"} referenceSet={this.state.referenceSet}></ReferableComponents>
         </div>
       );
     }

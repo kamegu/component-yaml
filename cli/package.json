@@ -1,0 +1,29 @@
+{
+  "name": "cli",
+  "version": "1.0.0",
+  "description": "describe components in yaml and export to plantuml",
+  "main": "index.js",
+  "scripts": {
+    "tsc": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kamegu/component-yaml.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kamegu/component-yaml/issues"
+  },
+  "homepage": "https://github.com/kamegu/component-yaml#readme",
+  "dependencies": {
+    "@types/node": "^18.0.4",
+    "commander": "^9.3.0",
+    "yaml": "^2.1.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4"
+  }
+}
