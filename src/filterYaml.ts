@@ -1,4 +1,4 @@
-import {ParsedYaml, ComponentYaml, ComponentElemYaml, RelationYaml, GroupYaml, Element} from './ParsedYaml'
+import {ParsedYaml, ComponentYaml, ComponentElemYaml, RelationYaml, GroupYaml, Element} from './ParsedYaml.js'
 
 export function filterYaml(parsed: ParsedYaml, targets: Array<string>): ParsedYaml {
   if (!targets || targets.length === 0) {

@@ -1,4 +1,4 @@
-import {ComponentElemYaml, Element, GroupYaml, ParsedYaml} from "./ParsedYaml";
+import {ComponentElemYaml, Element, GroupYaml, ParsedYaml} from "./ParsedYaml.js";
 
 export class ReferenceSet {
   refMap: Map<string, Map<string, string>>

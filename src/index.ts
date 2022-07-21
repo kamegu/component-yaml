@@ -3,11 +3,11 @@ import * as YAML from 'yaml'
 import { Command } from 'commander';
 const program = new Command();
 
-import {ParsedYaml, ComponentYaml} from './ParsedYaml'
-import {filterYaml} from "./filterYaml";
-import {ReferenceSet} from "./ReferenceSet";
-import {buildPuml} from './plantuml'
-import {buildMermaid} from "./mermaid";
+import {ParsedYaml, ComponentYaml} from './ParsedYaml.js'
+import {filterYaml} from "./filterYaml.js";
+import {ReferenceSet} from "./ReferenceSet.js";
+import {buildPuml} from './plantuml.js'
+import {buildMermaid} from "./mermaid.js";
 
 function parseRawYaml(rawYaml: any): ParsedYaml {
   const components = new Map<string, ComponentYaml>();

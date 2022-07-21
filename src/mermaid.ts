@@ -1,4 +1,4 @@
-import {ParsedYaml, ComponentYaml, ComponentElemYaml, RelationYaml, GroupYaml, Element} from './ParsedYaml'
+import {ParsedYaml, ComponentYaml, ComponentElemYaml, RelationYaml, GroupYaml, Element} from './ParsedYaml.js'
 
 function groupedBlock(type: string, compName: string, elems: Array<string|ComponentElemYaml>): string {
   if (elems.length === 0) {
