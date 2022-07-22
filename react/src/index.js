@@ -6,7 +6,7 @@ import {ReferenceSet} from "cli/dist/ReferenceSet";
 import {parseRawYaml} from "cli/dist/ParsedYaml";
 import {filterYaml} from "cli/dist/filterYaml";
 import {buildMermaid} from "cli/dist/mermaid";
-import Mermaid from "./Mermaid";
+import {MermaidBlock} from "./Mermaid";
 
 class ComponentList extends React.Component {
   render() {
@@ -110,14 +110,12 @@ class ReferableComponents extends React.Component {
     const filtered = filterYaml(this.state.parsedYaml, referable)
     const mermaidText = buildMermaid(filtered, false)
 
-    console.log('mermaidText', mermaidText)
-
     return (
       <div>
         <div>
         {referable.map((ref) => <span key={ref}>{ref}</span>)}
         </div>
-        <Mermaid chart={mermaidText} />
+        <MermaidBlock chart={mermaidText} />
       </div>
     )
   }
