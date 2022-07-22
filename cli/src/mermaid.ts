@@ -1,9 +1,10 @@
 import {ParsedYaml, ComponentYaml, ComponentElemYaml, RelationYaml, GroupYaml, Element} from './ParsedYaml.js'
 
-function groupedBlock(type: string, compName: string, elems: Array<string|ComponentElemYaml>): string {
+function groupedBlock(type: string, compName: string, groupName: string, elems: Array<string|ComponentElemYaml>): string {
   if (elems.length === 0) {
     return ""
   }
+  const subgraphName = groupName.length > 0 ? `${compName}/${groupName}` : compName
   const elements = new Array<Element>()
   const relations = new Array<string>()
 
@@ -49,7 +50,7 @@ function groupedBlock(type: string, compName: string, elems: Array<string|Compon
       const elementsBlock = elements.map((elem) => `${indent}${shape(elem)}`).join("\n")
       return wrapSubgraph(elementsBlock)
     } else {
-      return elements.map((elem) => `${indent}subgraph ${compName}/${elem.inner.name}
+      return elements.map((elem) => `${indent}subgraph ${subgraphName}/${elem.inner.name}
 ${indent}${shape(elem)}
 ${indent}end
 `)
@@ -58,7 +59,7 @@ ${indent}end
   }
 
   function wrapSubgraph(block: string) {
-    return `${indent}subgraph ${compName}
+    return `${indent}subgraph ${subgraphName}
 ${block}
 ${indent}end
 `
@@ -84,12 +85,12 @@ export function buildMermaid(parsedYaml: ParsedYaml, wrapMarkdown: boolean = tru
   parsedYaml.components.forEach((component: ComponentYaml, name: string) => {
     const type = component.type
 
-    const block = groupedBlock(type, name, component.elements)
+    const block = groupedBlock(type, name, '', component.elements)
     components.push(block);
 
     if (component.groups) {
       component.groups.forEach((group: GroupYaml) => {
-        const block = groupedBlock(type, name + "/" + group.name, group.elements)
+        const block = groupedBlock(type, name, group.name, group.elements)
         components.push(block);
       })
     }
